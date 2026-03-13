@@ -1,0 +1,39 @@
+body {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.stat-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.entry-card {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.entry-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.4rem 0.8rem rgba(0, 0, 0, 0.1) !important;
+}
+
+.entry-content {
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+}
+
+textarea.form-control {
+  resize: vertical;
+}
+
+.border-dashed {
+  border: 2px dashed #dee2e6 !important;
+}
