@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}대시보드 - 개발 일지{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0"><i class="bi bi-house me-2"></i>대시보드</h2>
+  <a href="{{ url_for('new_entry') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>새 일지 작성
+  </a>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card text-center border-0 shadow-sm stat-card">
+      <div class="card-body py-4">
+        <i class="bi bi-file-text display-4 text-primary"></i>
+        <h2 class="mt-2 fw-bold">{{ total }}</h2>
+        <p class="text-muted mb-0">전체 일지</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center border-0 shadow-sm stat-card">
+      <div class="card-body py-4">
+        <i class="bi bi-tags display-4 text-success"></i>
+        <h2 class="mt-2 fw-bold">{{ all_tags }}</h2>
+        <p class="text-muted mb-0">등록된 태그</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-center border-0 shadow-sm stat-card">
+      <div class="card-body py-4">
+        <i class="bi bi-calendar-check display-4 text-warning"></i>
+        <h2 class="mt-2 fw-bold">{{ recent|length }}</h2>
+        <p class="text-muted mb-0">최근 업데이트</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Entries -->
+<h5 class="fw-bold mb-3"><i class="bi bi-clock-history me-2"></i>최근 일지</h5>
+{% if recent %}
+  <div class="list-group shadow-sm">
+    {% for entry in recent %}
+      <a href="{{ url_for('view_entry', entry_id=entry.id) }}"
+         class="list-group-item list-group-item-action">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h6 class="mb-1 fw-semibold">{{ entry.title }}</h6>
+            <p class="mb-1 text-muted small">{{ entry.content[:100] }}{% if entry.content|length > 100 %}…{% endif %}</p>
+            {% for tag in entry.tags %}
+              <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+            {% endfor %}
+          </div>
+          <small class="text-muted text-nowrap ms-3">
+            {{ entry.created_at.strftime('%Y-%m-%d') }}
+          </small>
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+  <div class="text-end mt-2">
+    <a href="{{ url_for('entries') }}" class="btn btn-link btn-sm">전체 보기 →</a>
+  </div>
+{% else %}
+  <div class="card border-dashed text-center py-5">
+    <i class="bi bi-journal-x display-4 text-muted"></i>
+    <p class="text-muted mt-3">아직 작성된 일지가 없습니다.</p>
+    <a href="{{ url_for('new_entry') }}" class="btn btn-primary btn-sm mt-1">첫 일지 작성하기</a>
+  </div>
+{% endif %}
+{% endblock %}

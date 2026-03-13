@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}{{ entry.title }} - 개발 일지{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+      <a href="{{ url_for('entries') }}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i>목록으로
+      </a>
+      <div>
+        <a href="{{ url_for('edit_entry', entry_id=entry.id) }}"
+           class="btn btn-outline-primary btn-sm me-1">
+          <i class="bi bi-pencil me-1"></i>수정
+        </a>
+        <form action="{{ url_for('delete_entry', entry_id=entry.id) }}"
+              method="post" class="d-inline"
+              onsubmit="return confirm('이 일지를 삭제하시겠습니까?')">
+          <button class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-trash me-1"></i>삭제
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h2 class="fw-bold mb-2">{{ entry.title }}</h2>
+        <div class="text-muted small mb-3">
+          <i class="bi bi-clock me-1"></i>{{ entry.created_at.strftime('%Y년 %m월 %d일 %H:%M') }}
+          {% if entry.updated_at and entry.updated_at != entry.created_at %}
+            &nbsp;·&nbsp;<i class="bi bi-pencil me-1"></i>수정됨 {{ entry.updated_at.strftime('%Y-%m-%d %H:%M') }}
+          {% endif %}
+        </div>
+        {% if entry.tags %}
+          <div class="mb-3">
+            {% for tag in entry.tags %}
+              <a href="{{ url_for('entries', tag=tag.id) }}"
+                 class="badge bg-secondary text-decoration-none me-1">{{ tag.name }}</a>
+            {% endfor %}
+          </div>
+        {% endif %}
+        <hr />
+        <div class="entry-content">
+          {{ entry.content | replace('\n', '<br>') | safe }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

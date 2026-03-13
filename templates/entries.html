@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}일지 목록 - 개발 일지{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="fw-bold mb-0">
+    <i class="bi bi-file-text me-2"></i>
+    {% if active_tag %}
+      <span class="badge bg-secondary">{{ active_tag.name }}</span> 태그의 일지
+    {% else %}
+      전체 일지
+    {% endif %}
+  </h2>
+  <a href="{{ url_for('new_entry') }}" class="btn btn-primary">
+    <i class="bi bi-plus-lg me-1"></i>새 일지
+  </a>
+</div>
+
+<!-- Tag Filter -->
+{% if tags %}
+<div class="mb-3">
+  <a href="{{ url_for('entries') }}"
+     class="btn btn-sm {% if not active_tag %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">
+    전체
+  </a>
+  {% for tag in tags %}
+    <a href="{{ url_for('entries', tag=tag.id) }}"
+       class="btn btn-sm {% if active_tag and active_tag.id == tag.id %}btn-dark{% else %}btn-outline-secondary{% endif %} me-1 mb-1">
+      {{ tag.name }} <span class="badge bg-light text-dark ms-1">{{ tag.entries|length }}</span>
+    </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- Entry List -->
+{% if entries %}
+  <div class="row g-3">
+    {% for entry in entries %}
+      <div class="col-md-6">
+        <div class="card h-100 shadow-sm entry-card">
+          <div class="card-body">
+            <h5 class="card-title fw-semibold">
+              <a href="{{ url_for('view_entry', entry_id=entry.id) }}" class="text-decoration-none text-dark">
+                {{ entry.title }}
+              </a>
+            </h5>
+            <p class="card-text text-muted small">
+              {{ entry.content[:120] }}{% if entry.content|length > 120 %}…{% endif %}
+            </p>
+            {% for tag in entry.tags %}
+              <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+            {% endfor %}
+          </div>
+          <div class="card-footer bg-transparent d-flex justify-content-between align-items-center">
+            <small class="text-muted">{{ entry.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+            <div>
+              <a href="{{ url_for('edit_entry', entry_id=entry.id) }}"
+                 class="btn btn-outline-secondary btn-sm me-1">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form action="{{ url_for('delete_entry', entry_id=entry.id) }}"
+                    method="post" class="d-inline"
+                    onsubmit="return confirm('삭제하시겠습니까?')">
+                <button class="btn btn-outline-danger btn-sm">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="card text-center py-5">
+    <i class="bi bi-journal-x display-4 text-muted"></i>
+    <p class="text-muted mt-3">일지가 없습니다.</p>
+    <a href="{{ url_for('new_entry') }}" class="btn btn-primary btn-sm mt-1">새 일지 작성</a>
+  </div>
+{% endif %}
+{% endblock %}

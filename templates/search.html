@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}검색 - 개발 일지{% endblock %}
+
+{% block content %}
+<h2 class="fw-bold mb-4"><i class="bi bi-search me-2"></i>검색</h2>
+
+<form method="get" action="{{ url_for('search') }}" class="mb-4">
+  <div class="input-group input-group-lg">
+    <input type="search" name="q" class="form-control"
+           placeholder="제목 또는 내용으로 검색..." value="{{ q }}" autofocus />
+    <button class="btn btn-primary" type="submit">
+      <i class="bi bi-search me-1"></i>검색
+    </button>
+  </div>
+</form>
+
+{% if q %}
+  <p class="text-muted mb-3">
+    "<strong>{{ q }}</strong>" 검색 결과: <strong>{{ results|length }}</strong>건
+  </p>
+
+  {% if results %}
+    <div class="list-group shadow-sm">
+      {% for entry in results %}
+        <a href="{{ url_for('view_entry', entry_id=entry.id) }}"
+           class="list-group-item list-group-item-action">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <h6 class="mb-1 fw-semibold">{{ entry.title }}</h6>
+              <p class="mb-1 text-muted small">
+                {{ entry.content[:150] }}{% if entry.content|length > 150 %}…{% endif %}
+              </p>
+              {% for tag in entry.tags %}
+                <span class="badge bg-secondary me-1">{{ tag.name }}</span>
+              {% endfor %}
+            </div>
+            <small class="text-muted text-nowrap ms-3">
+              {{ entry.created_at.strftime('%Y-%m-%d') }}
+            </small>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card text-center py-5">
+      <i class="bi bi-emoji-frown display-4 text-muted"></i>
+      <p class="text-muted mt-3">검색 결과가 없습니다.</p>
+    </div>
+  {% endif %}
+{% else %}
+  <div class="card text-center py-5 text-muted">
+    <i class="bi bi-search display-4"></i>
+    <p class="mt-3">검색어를 입력하여 일지를 찾아보세요.</p>
+  </div>
+{% endif %}
+{% endblock %}
