@@ -30,6 +30,21 @@ class Tag(db.Model):
     id   = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
 
+# ── Helpers ─────────────────────────────────────────────────────────────────
+
+def _parse_entry_form():
+    """POST 폼에서 title/content/tag_ids를 파싱하고 유효성을 검사한다.
+
+    Returns:
+        (title, content, tag_ids, error) — error 는 실패 시 메시지, 통과 시 None.
+    """
+    title   = request.form.get('title', '').strip()
+    content = request.form.get('content', '').strip()
+    tag_ids = request.form.getlist('tags', type=int)
+    if not title or not content:
+        return title, content, tag_ids, '제목과 내용을 모두 입력해주세요.'
+    return title, content, tag_ids, None
+
 # ── Routes: Dashboard ────────────────────────────────────────────────────────
 
 @app.route('/')
@@ -58,11 +73,9 @@ def entries():
 def new_entry():
     all_tags = Tag.query.order_by(Tag.name).all()
     if request.method == 'POST':
-        title   = request.form['title'].strip()
-        content = request.form['content'].strip()
-        tag_ids = request.form.getlist('tags', type=int)
-        if not title or not content:
-            flash('제목과 내용을 모두 입력해주세요.', 'danger')
+        title, content, tag_ids, error = _parse_entry_form()
+        if error:
+            flash(error, 'danger')
             return render_template('entry_form.html', all_tags=all_tags, entry=None)
         entry = Entry(title=title, content=content)
         for tid in tag_ids:
@@ -85,11 +98,9 @@ def edit_entry(entry_id):
     entry    = Entry.query.get_or_404(entry_id)
     all_tags = Tag.query.order_by(Tag.name).all()
     if request.method == 'POST':
-        title   = request.form['title'].strip()
-        content = request.form['content'].strip()
-        tag_ids = request.form.getlist('tags', type=int)
-        if not title or not content:
-            flash('제목과 내용을 모두 입력해주세요.', 'danger')
+        title, content, tag_ids, error = _parse_entry_form()
+        if error:
+            flash(error, 'danger')
             return render_template('entry_form.html', all_tags=all_tags, entry=entry)
         entry.title   = title
         entry.content = content
