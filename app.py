@@ -1,10 +1,11 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'dev-journal-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///journal.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-journal-secret-key')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///journal.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -28,6 +29,31 @@ class Entry(db.Model):
 class Tag(db.Model):
     id   = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
+
+# ── Helpers ─────────────────────────────────────────────────────────────────
+
+def _parse_entry_form():
+    """POST 폼에서 title/content/tag_ids를 파싱하고 유효성을 검사한다.
+
+    Returns:
+        (title, content, tag_ids, error) — error 는 실패 시 메시지, 통과 시 None.
+    """
+    title   = request.form.get('title', '').strip()
+    content = request.form.get('content', '').strip()
+    tag_ids = request.form.getlist('tags', type=int)
+    if not title or not content:
+        return title, content, tag_ids, '제목과 내용을 모두 입력해주세요.'
+    return title, content, tag_ids, None
+
+
+def _assign_tags(tag_ids):
+    """tag_ids 리스트를 IN 단일 쿼리로 조회해 Tag 객체 리스트를 반환한다.
+
+    원래 코드는 Tag.query.get(tid)를 필터와 값 취득에 두 번 호용하는 N+1 패턴이었다.
+    """
+    if not tag_ids:
+        return []
+    return Tag.query.filter(Tag.id.in_(tag_ids)).all()
 
 # ── Routes: Dashboard ────────────────────────────────────────────────────────
 
@@ -57,17 +83,12 @@ def entries():
 def new_entry():
     all_tags = Tag.query.order_by(Tag.name).all()
     if request.method == 'POST':
-        title   = request.form['title'].strip()
-        content = request.form['content'].strip()
-        tag_ids = request.form.getlist('tags', type=int)
-        if not title or not content:
-            flash('제목과 내용을 모두 입력해주세요.', 'danger')
+        title, content, tag_ids, error = _parse_entry_form()
+        if error:
+            flash(error, 'danger')
             return render_template('entry_form.html', all_tags=all_tags, entry=None)
         entry = Entry(title=title, content=content)
-        for tid in tag_ids:
-            t = Tag.query.get(tid)
-            if t:
-                entry.tags.append(t)
+        entry.tags = _assign_tags(tag_ids)
         db.session.add(entry)
         db.session.commit()
         flash('일지가 저장되었습니다.', 'success')
@@ -84,15 +105,13 @@ def edit_entry(entry_id):
     entry    = Entry.query.get_or_404(entry_id)
     all_tags = Tag.query.order_by(Tag.name).all()
     if request.method == 'POST':
-        title   = request.form['title'].strip()
-        content = request.form['content'].strip()
-        tag_ids = request.form.getlist('tags', type=int)
-        if not title or not content:
-            flash('제목과 내용을 모두 입력해주세요.', 'danger')
+        title, content, tag_ids, error = _parse_entry_form()
+        if error:
+            flash(error, 'danger')
             return render_template('entry_form.html', all_tags=all_tags, entry=entry)
         entry.title   = title
         entry.content = content
-        entry.tags    = [Tag.query.get(tid) for tid in tag_ids if Tag.query.get(tid)]
+        entry.tags    = _assign_tags(tag_ids)
         db.session.commit()
         flash('일지가 수정되었습니다.', 'success')
         return redirect(url_for('view_entry', entry_id=entry.id))

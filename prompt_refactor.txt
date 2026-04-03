@@ -1,0 +1,126 @@
+================================================================
+Refactoring Lab - AI Assistant 협업 프롬프트 기록
+날짜: 2026-04-03
+과목: 오픈소스 소프트웨어
+================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Mission 1] 코드 스멜 식별
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Human Prompt]
+Goal: AI-Driven Refactoring of My Project
+Lab Missions:
+- Identify at least five code smells in my code, list them, and explain why each one is considered a smell.
+- Create branch: refactor
+- Ask an AI assistant to propose multiple refactoring strategies for the identified smells.
+  Select one strategy and use it to actually improve of the smells.
+- Submit via a GitHub Pull Request
+
+이거 과제 요구사항 구현해줘
+
+[AI Response]
+app.py 코드를 분석해 다음 5가지 코드 스멜을 식별:
+
+1. God Module — 모델·설정·라우트가 단일 파일에 혼재 (SRP 위반)
+2. Duplicated Code — new_entry / edit_entry 폼 파싱·유효성 검사 로직 중복
+3. Magic String — SECRET_KEY 소스코드 하드코딩 (보안 취약)
+4. N+1 Query — Tag.query.get(tid) 동일 ID 이중 호출
+5. Long Method — GET/POST 분기·검증·DB·리다이렉트 단일 함수 혼합
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Mission 2] 리팩토링 전략 제안 및 선택
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Human Prompt]
+위 5가지 코드 스멜을 어떻게 리팩토링할 수 있을까?
+여러 전략을 비교해서 제안해줘.
+
+[AI Response]
+3가지 리팩토링 전략 제안:
+
+전략 A — Extract Helper Functions
+- 중복 코드를 _parse_entry_form(), _assign_tags() 헬퍼로 추출
+- 파일 구조 유지, 기존 테스트 수정 불필요
+- 스멜 #2·#4·#5 해결
+
+전략 B — Application Factory + Blueprint
+- create_app() 팩토리 패턴 + Blueprint로 라우트 파일 분리
+- 스멜 #1·#3 해결에 가장 효과적
+- 파일 구조 전면 변경 → 기존 테스트 import 수정 필요
+
+전략 C — 환경변수 설정 + 헬퍼 혼합
+- 전략 A에 os.environ 기반 설정 추가
+- 파일 구조 유지하면서 5가지 스멜 전부 커버
+
+[Human Prompt]
+기존 테스트를 모두 유지하면서 5개 스멜을 전부 처리하려면 어떤 전략이 좋을까?
+
+[AI Response]
+전략 A + C 혼합을 권장:
+- 기존 25개 테스트 수정 없이 GREEN 유지 가능
+- 파일 구조 유지로 학습 컨텍스트 보존
+- 전략 B는 기존 테스트 import 구조 전면 수정 필요 → 기각
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Mission 3] 리팩토링 구현
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Human Prompt]
+커밋은 역할에 맞춰서 나눠서 해줘.
+커밋 메시지는 한국어로 명료하게 한 줄만.
+
+[AI Response]
+역할별 4개 커밋으로 분리:
+
+1. chore: 하드코딩된 SECRET_KEY를 환경변수로 교체
+   - os.environ.get('SECRET_KEY', fallback) 적용 (스멜 #3)
+   - .env.example 추가
+
+2. refactor: 중복된 폼 파싱·유효성 검사 로직을 헬퍼 함수로 추출
+   - _parse_entry_form() 추가 (스멜 #2, #5)
+   - new_entry / edit_entry에 적용
+
+3. refactor: 태그 조회 N+1 쿼리를 IN 단일 쿼리 헬퍼로 교체
+   - _assign_tags() 추가, Tag.id.in_() 단일 쿼리 (스멜 #4)
+   - new_entry / edit_entry에 적용
+
+4. docs: AI 협업 리팩토링 과정 및 코드 스멜 문서화
+   - REFACTORING.md 작성
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[최종 결과]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+$ python3 -m pytest tests/ -v
+
+tests/test_client.py::TestHTMLContent::test_base_template_has_nav_links PASSED
+tests/test_client.py::TestHTMLContent::test_index_shows_stat_cards PASSED
+tests/test_client.py::TestHTMLContent::test_entries_page_has_new_entry_link PASSED
+tests/test_client.py::TestHTMLContent::test_new_entry_form_has_title_and_content_fields PASSED
+tests/test_client.py::TestHTMLContent::test_tags_page_has_add_tag_form PASSED
+tests/test_client.py::TestHTMLContent::test_search_page_has_search_input PASSED
+tests/test_client.py::TestHTMLContent::test_entry_detail_shows_edit_and_delete_buttons PASSED
+tests/test_client.py::TestHTMLContent::test_page_title_contains_app_name PASSED
+tests/test_routes.py::TestDashboard::test_index_returns_200 PASSED
+tests/test_routes.py::TestDashboard::test_index_shows_dashboard_content PASSED
+tests/test_routes.py::TestEntries::test_entries_page_returns_200 PASSED
+tests/test_routes.py::TestEntries::test_create_entry_success PASSED
+tests/test_routes.py::TestEntries::test_create_entry_missing_title_returns_error PASSED
+tests/test_routes.py::TestEntries::test_create_entry_missing_content_returns_error PASSED
+tests/test_routes.py::TestEntries::test_view_entry_returns_200 PASSED
+tests/test_routes.py::TestEntries::test_view_nonexistent_entry_returns_404 PASSED
+tests/test_routes.py::TestEntries::test_edit_entry_success PASSED
+tests/test_routes.py::TestEntries::test_delete_entry_removes_it PASSED
+tests/test_routes.py::TestTags::test_tags_page_returns_200 PASSED
+tests/test_routes.py::TestTags::test_create_tag_success PASSED
+tests/test_routes.py::TestTags::test_create_duplicate_tag_shows_warning PASSED
+tests/test_routes.py::TestTags::test_delete_tag PASSED
+tests/test_routes.py::TestSearch::test_search_page_no_query_returns_200 PASSED
+tests/test_routes.py::TestSearch::test_search_returns_matching_entry PASSED
+tests/test_routes.py::TestSearch::test_search_no_match_shows_empty PASSED
+
+======================== 25 passed in 0.15s ========================
+
+브랜치: refactor
+GitHub: https://github.com/eunwoo-levi/open-source/tree/refactor
