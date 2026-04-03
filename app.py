@@ -1,10 +1,11 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'dev-journal-secret-key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///journal.db'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-journal-secret-key')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///journal.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
