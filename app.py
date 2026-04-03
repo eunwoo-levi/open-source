@@ -45,6 +45,16 @@ def _parse_entry_form():
         return title, content, tag_ids, '제목과 내용을 모두 입력해주세요.'
     return title, content, tag_ids, None
 
+
+def _assign_tags(tag_ids):
+    """tag_ids 리스트를 IN 단일 쿼리로 조회해 Tag 객체 리스트를 반환한다.
+
+    원래 코드는 Tag.query.get(tid)를 필터와 값 취득에 두 번 호용하는 N+1 패턴이었다.
+    """
+    if not tag_ids:
+        return []
+    return Tag.query.filter(Tag.id.in_(tag_ids)).all()
+
 # ── Routes: Dashboard ────────────────────────────────────────────────────────
 
 @app.route('/')
@@ -78,10 +88,7 @@ def new_entry():
             flash(error, 'danger')
             return render_template('entry_form.html', all_tags=all_tags, entry=None)
         entry = Entry(title=title, content=content)
-        for tid in tag_ids:
-            t = Tag.query.get(tid)
-            if t:
-                entry.tags.append(t)
+        entry.tags = _assign_tags(tag_ids)
         db.session.add(entry)
         db.session.commit()
         flash('일지가 저장되었습니다.', 'success')
@@ -104,7 +111,7 @@ def edit_entry(entry_id):
             return render_template('entry_form.html', all_tags=all_tags, entry=entry)
         entry.title   = title
         entry.content = content
-        entry.tags    = [Tag.query.get(tid) for tid in tag_ids if Tag.query.get(tid)]
+        entry.tags    = _assign_tags(tag_ids)
         db.session.commit()
         flash('일지가 수정되었습니다.', 'success')
         return redirect(url_for('view_entry', entry_id=entry.id))
