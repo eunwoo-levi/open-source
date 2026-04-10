@@ -1,0 +1,142 @@
+================================================================
+TDD Lab - AI Assistant 협업 프롬프트 기록
+날짜: 2026-03-20
+과목: 오픈소스 소프트웨어
+================================================================
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Mission 1] Pytest 환경 설정
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Human Prompt]
+Goal: Implement My Web Service using TDD cycle with AI Assistant collaboration.
+Lab Missions:
+1. Setup Pytest environment.
+2. Create branch: test
+3. TDD: RED (Human defines spec) → GREEN (AI implements)
+4. Continue with Web routes, client-side verification.
+5. Push to GitHub
+
+이걸 구현하는게 과제인데 해줘
+
+[AI Response]
+기존 Flask 개발 일지 앱(app.py)을 분석하고 다음을 수행:
+- requirements.txt에 pytest==8.1.1, pytest-flask==1.3.0 추가
+- conftest.py 작성: 인메모리 SQLite 기반 app/client 픽스처
+- tests/__init__.py 생성: 테스트 디렉토리 패키지 초기화
+- git checkout -b test 로 브랜치 생성
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Mission 3] TDD RED → GREEN 사이클
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Human defines spec - RED]
+다음 스펙을 테스트로 정의해줘:
+
+대시보드:
+- GET / 는 HTTP 200을 반환해야 한다
+- 페이지에 '대시보드' 문자열이 포함되어야 한다
+
+일지(Entries) CRUD:
+- GET /entries 는 HTTP 200을 반환해야 한다
+- POST /entries/new 에 title과 content를 보내면 성공적으로 저장되어야 한다
+- title이 없으면 폼 페이지를 다시 렌더링하고 오류 메시지를 보여줘야 한다
+- content가 없어도 오류 처리되어야 한다
+- GET /entries/<id> 는 200을 반환하고 해당 일지 제목을 보여줘야 한다
+- 존재하지 않는 id로 접근하면 404를 반환해야 한다
+- POST /entries/<id>/edit 는 수정 후 리다이렉트되어야 한다
+- POST /entries/<id>/delete 는 삭제 후 목록에서 사라져야 한다
+
+태그(Tags):
+- GET /tags 는 HTTP 200을 반환해야 한다
+- POST /tags/new 로 새 태그를 생성할 수 있어야 한다
+- 중복된 태그를 생성하면 경고 메시지가 표시되어야 한다
+- POST /tags/<id>/delete 로 태그가 삭제되어야 한다
+
+검색(Search):
+- GET /search 는 쿼리 없이도 200을 반환해야 한다
+- GET /search?q=flask 는 해당 키워드가 포함된 일지를 반환해야 한다
+- 일치하는 항목이 없으면 결과가 비어 있어야 한다
+
+[AI Response - GREEN]
+tests/test_routes.py 작성:
+- 위 스펙을 그대로 pytest 테스트 메서드로 구현
+- _create_entry(), _seed_entry(), _seed_tag() 헬퍼 함수 작성
+- 17개 테스트 모두 PASSED
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Mission 4] 클라이언트 측 HTML 검증
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Human defines spec - RED]
+렌더링된 HTML이 올바른 UI 구조를 갖추는지 검증해줘:
+
+- 모든 페이지에 네비게이션 링크(대시보드, 일지 목록, 태그, 검색)가 있어야 한다
+- /entries 페이지에는 새 일지 작성 링크(/entries/new)가 있어야 한다
+- 새 일지 폼에는 title과 content 입력 필드가 있어야 한다
+- 태그 페이지에는 태그 추가 폼(action=/tags/new)이 있어야 한다
+- 검색 페이지에는 쿼리 입력 필드(name='q')가 있어야 한다
+- 일지 상세 페이지에는 수정·삭제 버튼이 있어야 한다
+- 모든 페이지의 <title> 태그에 앱 이름이 포함되어야 한다
+
+[AI Response - GREEN]
+tests/test_client.py 작성:
+- 위 스펙을 HTML 응답 body 파싱으로 검증
+- 8개 테스트 모두 PASSED
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[Mission 5] GitHub 푸시
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Human Prompt]
+한꺼번에 커밋하지말고 역할에 맞춰서 나눠서 해줘
+
+[AI Response]
+역할별 4개 커밋으로 분리:
+1. chore: pytest 테스트 환경 패키지 추가       (requirements.txt)
+2. test: pytest 픽스처 및 테스트 패키지 구조 설정 (conftest.py, tests/__init__.py)
+3. test: RED→GREEN 라우트 테스트 작성 (TDD 사이클 적용) (tests/test_routes.py)
+4. test: 클라이언트 측 HTML 콘텐츠 검증 테스트 추가   (tests/test_client.py)
+
+[Human Prompt]
+한국어로 명료하게 커밋메시지
+
+[AI Response]
+위 4개 커밋을 한국어 메시지로 재작성 후 git push -u origin test 실행
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[최종 결과]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+$ python3 -m pytest tests/ -v
+
+tests/test_client.py::TestHTMLContent::test_base_template_has_nav_links PASSED
+tests/test_client.py::TestHTMLContent::test_index_shows_stat_cards PASSED
+tests/test_client.py::TestHTMLContent::test_entries_page_has_new_entry_link PASSED
+tests/test_client.py::TestHTMLContent::test_new_entry_form_has_title_and_content_fields PASSED
+tests/test_client.py::TestHTMLContent::test_tags_page_has_add_tag_form PASSED
+tests/test_client.py::TestHTMLContent::test_search_page_has_search_input PASSED
+tests/test_client.py::TestHTMLContent::test_entry_detail_shows_edit_and_delete_buttons PASSED
+tests/test_client.py::TestHTMLContent::test_page_title_contains_app_name PASSED
+tests/test_routes.py::TestDashboard::test_index_returns_200 PASSED
+tests/test_routes.py::TestDashboard::test_index_shows_dashboard_content PASSED
+tests/test_routes.py::TestEntries::test_entries_page_returns_200 PASSED
+tests/test_routes.py::TestEntries::test_create_entry_success PASSED
+tests/test_routes.py::TestEntries::test_create_entry_missing_title_returns_error PASSED
+tests/test_routes.py::TestEntries::test_create_entry_missing_content_returns_error PASSED
+tests/test_routes.py::TestEntries::test_view_entry_returns_200 PASSED
+tests/test_routes.py::TestEntries::test_view_nonexistent_entry_returns_404 PASSED
+tests/test_routes.py::TestEntries::test_edit_entry_success PASSED
+tests/test_routes.py::TestEntries::test_delete_entry_removes_it PASSED
+tests/test_routes.py::TestTags::test_tags_page_returns_200 PASSED
+tests/test_routes.py::TestTags::test_create_tag_success PASSED
+tests/test_routes.py::TestTags::test_create_duplicate_tag_shows_warning PASSED
+tests/test_routes.py::TestTags::test_delete_tag PASSED
+tests/test_routes.py::TestSearch::test_search_page_no_query_returns_200 PASSED
+tests/test_routes.py::TestSearch::test_search_returns_matching_entry PASSED
+tests/test_routes.py::TestSearch::test_search_no_match_shows_empty PASSED
+
+======================== 25 passed in 0.18s ========================
+
+브랜치: test
+GitHub: https://github.com/eunwoo-levi/open-source/tree/test
