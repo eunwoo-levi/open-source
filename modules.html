@@ -1,0 +1,525 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Module Reference &mdash; Dev Journal Documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8d563738"></script>
+      <script src="_static/doctools.js?v=9a2dae69"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2c3e50" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            Dev Journal
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Module Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#application-module-app">Application Module (<code class="docutils literal notranslate"><span class="pre">app</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#app-py-dev-journal-flask-application">app.py — Dev Journal Flask Application</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.Entry"><code class="docutils literal notranslate"><span class="pre">Entry</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.Entry.id"><code class="docutils literal notranslate"><span class="pre">Entry.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.Entry.title"><code class="docutils literal notranslate"><span class="pre">Entry.title</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.Entry.content"><code class="docutils literal notranslate"><span class="pre">Entry.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.Entry.created_at"><code class="docutils literal notranslate"><span class="pre">Entry.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.Entry.updated_at"><code class="docutils literal notranslate"><span class="pre">Entry.updated_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.Entry.tags"><code class="docutils literal notranslate"><span class="pre">Entry.tags</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#id0"><code class="docutils literal notranslate"><span class="pre">Entry.tags</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#app.Tag"><code class="docutils literal notranslate"><span class="pre">Tag</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#app.Tag.id"><code class="docutils literal notranslate"><span class="pre">Tag.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#app.Tag.name"><code class="docutils literal notranslate"><span class="pre">Tag.name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#app.index"><code class="docutils literal notranslate"><span class="pre">index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.entries"><code class="docutils literal notranslate"><span class="pre">entries()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.new_entry"><code class="docutils literal notranslate"><span class="pre">new_entry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.view_entry"><code class="docutils literal notranslate"><span class="pre">view_entry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.edit_entry"><code class="docutils literal notranslate"><span class="pre">edit_entry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.delete_entry"><code class="docutils literal notranslate"><span class="pre">delete_entry()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.tags"><code class="docutils literal notranslate"><span class="pre">tags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.new_tag"><code class="docutils literal notranslate"><span class="pre">new_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.delete_tag"><code class="docutils literal notranslate"><span class="pre">delete_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#app.search"><code class="docutils literal notranslate"><span class="pre">search()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#test-fixtures-conftest">Test Fixtures (<code class="docutils literal notranslate"><span class="pre">conftest</span></code>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#conftest.app"><code class="docutils literal notranslate"><span class="pre">app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#conftest.client"><code class="docutils literal notranslate"><span class="pre">client()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Links:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/eunwoo-levi/open-source">GitHub Repository</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2c3e50" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Dev Journal</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Module Reference</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/modules.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-reference">
+<h1>Module Reference<a class="headerlink" href="#module-reference" title="Link to this heading"></a></h1>
+<p>This section contains the auto-generated API reference for all modules
+in the Dev Journal application, extracted from their docstrings.</p>
+<section id="application-module-app">
+<h2>Application Module (<code class="docutils literal notranslate"><span class="pre">app</span></code>)<a class="headerlink" href="#application-module-app" title="Link to this heading"></a></h2>
+<p>The main application module containing Flask app configuration,
+SQLAlchemy models, helper functions, and all route handlers.</p>
+<section id="app-py-dev-journal-flask-application">
+<span id="module-app"></span><h3>app.py — Dev Journal Flask Application<a class="headerlink" href="#app-py-dev-journal-flask-application" title="Link to this heading"></a></h3>
+<p>A personal developer journal web application built with Flask and SQLite.
+Supports CRUD operations for journal entries, tag management, and full-text search.</p>
+<dl class="simple">
+<dt>Modules:</dt><dd><ul class="simple">
+<li><p>Entry: SQLAlchemy model for journal entries</p></li>
+<li><p>Tag: SQLAlchemy model for tags</p></li>
+<li><p>Routes: Flask route handlers for dashboard, entries, tags, and search</p></li>
+</ul>
+</dd>
+</dl>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">app</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+<p>The application will be available at <a class="reference external" href="http://localhost:5001">http://localhost:5001</a>.
+Interactive API docs are available at <a class="reference external" href="http://localhost:5001/apidocs">http://localhost:5001/apidocs</a>.</p>
+</section>
+<dl class="py class">
+<dt class="sig sig-object py" id="app.Entry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">Entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#Entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.Entry" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>SQLAlchemy model representing a journal entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>Any</em>)</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.Entry.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#app.Entry.id" title="Link to this definition"></a></dt>
+<dd><p>Primary key, auto-incremented.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.Entry.title">
+<span class="sig-name descname"><span class="pre">title</span></span><a class="headerlink" href="#app.Entry.title" title="Link to this definition"></a></dt>
+<dd><p>Title of the entry, max 200 characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.Entry.content">
+<span class="sig-name descname"><span class="pre">content</span></span><a class="headerlink" href="#app.Entry.content" title="Link to this definition"></a></dt>
+<dd><p>Full text content of the entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.Entry.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><a class="headerlink" href="#app.Entry.created_at" title="Link to this definition"></a></dt>
+<dd><p>UTC timestamp when the entry was created.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>datetime</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.Entry.updated_at">
+<span class="sig-name descname"><span class="pre">updated_at</span></span><a class="headerlink" href="#app.Entry.updated_at" title="Link to this definition"></a></dt>
+<dd><p>UTC timestamp of the last update.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>datetime</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.Entry.tags">
+<span class="sig-name descname"><span class="pre">tags</span></span><a class="headerlink" href="#app.Entry.tags" title="Link to this definition"></a></dt>
+<dd><p>List of associated <a class="reference internal" href="#app.Tag" title="app.Tag"><code class="xref py py-class docutils literal notranslate"><span class="pre">Tag</span></code></a> objects (many-to-many).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">entry</span> <span class="o">=</span> <span class="n">Entry</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Today&#39;s work&quot;</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="s2">&quot;Fixed the N+1 query bug.&quot;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">tags</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Tag'</span></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="app.Tag">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">Tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#Tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.Tag" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></p>
+<p>SQLAlchemy model representing a tag for categorizing entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> (<em>Any</em>)</p></li>
+<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Any</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.Tag.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#app.Tag.id" title="Link to this definition"></a></dt>
+<dd><p>Primary key, auto-incremented.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="app.Tag.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#app.Tag.name" title="Link to this definition"></a></dt>
+<dd><p>Unique tag name, max 50 characters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;python&#39;</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+<span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.index">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.index" title="Link to this definition"></a></dt>
+<dd><p>Render the dashboard with summary statistics and recent entries.</p>
+<p>Displays the total number of entries, total number of tags, and the
+5 most recent journal entries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Rendered HTML of <code class="docutils literal notranslate"><span class="pre">index.html</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.entries">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">entries</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.entries" title="Link to this definition"></a></dt>
+<dd><p>List all journal entries, optionally filtered by a tag.</p>
+<p>Accepts an optional <code class="docutils literal notranslate"><span class="pre">tag</span></code> query parameter (tag ID) to filter entries.
+Returns all entries ordered by creation date (newest first).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Tag ID as a query-string parameter.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rendered HTML of <code class="docutils literal notranslate"><span class="pre">entries.html</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.new_entry">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">new_entry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#new_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.new_entry" title="Link to this definition"></a></dt>
+<dd><p>Display and handle the new journal entry creation form.</p>
+<p><strong>GET</strong>: Renders an empty entry form.
+<strong>POST</strong>: Validates and saves a new entry to the database.
+Redirects to the entries list on success, or re-renders the form
+with an error message on validation failure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Rendered form HTML (GET/error), or redirect to entries list (success).</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.view_entry">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">view_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#view_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.view_entry" title="Link to this definition"></a></dt>
+<dd><p>Display the detail page for a single journal entry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The primary key of the entry to display.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rendered HTML of <code class="docutils literal notranslate"><span class="pre">entry_detail.html</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>werkzeug.exceptions.NotFound</strong> – If no entry with the given ID exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.edit_entry">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">edit_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#edit_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.edit_entry" title="Link to this definition"></a></dt>
+<dd><p>Display and handle the edit form for an existing journal entry.</p>
+<p><strong>GET</strong>: Renders the entry form pre-filled with existing data.
+<strong>POST</strong>: Validates and updates the entry in the database.
+Redirects to the entry detail page on success.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The primary key of the entry to edit.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rendered form HTML, or redirect to <code class="docutils literal notranslate"><span class="pre">view_entry</span></code> on success.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>werkzeug.exceptions.NotFound</strong> – If no entry with the given ID exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.delete_entry">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">delete_entry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entry_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#delete_entry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.delete_entry" title="Link to this definition"></a></dt>
+<dd><p>Delete a journal entry and redirect to the entries list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>entry_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The primary key of the entry to delete.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirect to the entries list page.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>werkzeug.exceptions.NotFound</strong> – If no entry with the given ID exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.tags">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">tags</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.tags" title="Link to this definition"></a></dt>
+<dd><p>List all available tags sorted alphabetically.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Rendered HTML of <code class="docutils literal notranslate"><span class="pre">tags.html</span></code>.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.new_tag">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">new_tag</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#new_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.new_tag" title="Link to this definition"></a></dt>
+<dd><p>Create a new tag from a POST form submission.</p>
+<p>Flashes an error if the name is empty or already exists;
+otherwise creates and persists the new tag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Redirect to the tags page.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Response</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.delete_tag">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">delete_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#delete_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.delete_tag" title="Link to this definition"></a></dt>
+<dd><p>Delete a tag by its ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tag_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The primary key of the tag to delete.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Redirect to the tags page.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Response</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>werkzeug.exceptions.NotFound</strong> – If no tag with the given ID exists.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="app.search">
+<span class="sig-prename descclassname"><span class="pre">app.</span></span><span class="sig-name descname"><span class="pre">search</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/app.html#search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#app.search" title="Link to this definition"></a></dt>
+<dd><p>Search journal entries by title or content keyword.</p>
+<p>Performs a case-insensitive full-text search across both <code class="docutils literal notranslate"><span class="pre">title</span></code>
+and <code class="docutils literal notranslate"><span class="pre">content</span></code> fields when a query is provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>q</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – Search keyword passed as a query-string parameter.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Rendered HTML of <code class="docutils literal notranslate"><span class="pre">search.html</span></code> with matching results.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="test-fixtures-conftest">
+<h2>Test Fixtures (<code class="docutils literal notranslate"><span class="pre">conftest</span></code>)<a class="headerlink" href="#test-fixtures-conftest" title="Link to this heading"></a></h2>
+<p>Pytest fixtures used across all test modules.</p>
+<p id="module-conftest">conftest.py — Pytest fixtures for the Dev Journal Flask app.</p>
+<dl class="simple">
+<dt>TDD Lab: Human defines specs (test names &amp; assertions),</dt><dd><p>AI implements the fixtures and test body.</p>
+</dd>
+</dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="conftest.app">
+<span class="sig-prename descclassname"><span class="pre">conftest.</span></span><span class="sig-name descname"><span class="pre">app</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/conftest.html#app"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conftest.app" title="Link to this definition"></a></dt>
+<dd><p>Session-scoped Flask application configured for testing.
+Uses an in-memory SQLite database so each test session is
+isolated from the production ‘instance/journal.db’.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="conftest.client">
+<span class="sig-prename descclassname"><span class="pre">conftest.</span></span><span class="sig-name descname"><span class="pre">client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/conftest.html#client"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#conftest.client" title="Link to this definition"></a></dt>
+<dd><p>Function-scoped test client.
+Creates all tables before each test and drops them after,
+guaranteeing a clean database state for every test case.</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="introduction.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Dev Journal Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,701 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>app &mdash; Dev Journal Documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9a2dae69"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2c3e50" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Dev Journal
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Module Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Links:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/eunwoo-levi/open-source">GitHub Repository</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2c3e50" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Dev Journal</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">app</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for app</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">app.py — Dev Journal Flask Application</span>
+<span class="sd">=======================================</span>
+
+<span class="sd">A personal developer journal web application built with Flask and SQLite.</span>
+<span class="sd">Supports CRUD operations for journal entries, tag management, and full-text search.</span>
+
+<span class="sd">Modules:</span>
+<span class="sd">    - Entry: SQLAlchemy model for journal entries</span>
+<span class="sd">    - Tag: SQLAlchemy model for tags</span>
+<span class="sd">    - Routes: Flask route handlers for dashboard, entries, tags, and search</span>
+
+<span class="sd">Usage::</span>
+
+<span class="sd">    python app.py</span>
+
+<span class="sd">The application will be available at http://localhost:5001.</span>
+<span class="sd">Interactive API docs are available at http://localhost:5001/apidocs.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask</span><span class="w"> </span><span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">url_for</span><span class="p">,</span> <span class="n">flash</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flask_sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">SQLAlchemy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">flasgger</span><span class="w"> </span><span class="kn">import</span> <span class="n">Swagger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SECRET_KEY&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;SECRET_KEY&#39;</span><span class="p">,</span> <span class="s1">&#39;dev-journal-secret-key&#39;</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_DATABASE_URI&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;DATABASE_URL&#39;</span><span class="p">,</span> <span class="s1">&#39;sqlite:///journal.db&#39;</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SQLALCHEMY_TRACK_MODIFICATIONS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">app</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;SWAGGER&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Dev Journal API&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;uiversion&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="s1">&#39;1.0.0&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s1">&#39;Interactive API documentation for the Dev Journal application. &#39;</span>
+        <span class="s1">&#39;Manage journal entries, tags, and search functionality.&#39;</span>
+    <span class="p">),</span>
+    <span class="s1">&#39;termsOfService&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;contact&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;Dev Journal&#39;</span><span class="p">},</span>
+    <span class="s1">&#39;license&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;MIT&#39;</span><span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">db</span> <span class="o">=</span> <span class="n">SQLAlchemy</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+<span class="n">swagger</span> <span class="o">=</span> <span class="n">Swagger</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+
+<span class="c1"># ── Models ──────────────────────────────────────────────────────────────────</span>
+
+<span class="n">entry_tags</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span>
+    <span class="s1">&#39;entry_tags&#39;</span><span class="p">,</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;entry_id&#39;</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;entry.id&#39;</span><span class="p">),</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="s1">&#39;tag_id&#39;</span><span class="p">,</span>   <span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">db</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;tag.id&#39;</span><span class="p">),</span>   <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="Entry">
+<a class="viewcode-back" href="../modules.html#app.Entry">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Entry</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SQLAlchemy model representing a journal entry.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        id (int): Primary key, auto-incremented.</span>
+<span class="sd">        title (str): Title of the entry, max 200 characters.</span>
+<span class="sd">        content (str): Full text content of the entry.</span>
+<span class="sd">        created_at (datetime): UTC timestamp when the entry was created.</span>
+<span class="sd">        updated_at (datetime): UTC timestamp of the last update.</span>
+<span class="sd">        tags (list): List of associated :class:`Tag` objects (many-to-many).</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        entry = Entry(title=&quot;Today&#39;s work&quot;, content=&quot;Fixed the N+1 query bug.&quot;)</span>
+<span class="sd">        db.session.add(entry)</span>
+<span class="sd">        db.session.commit()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">id</span>         <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">title</span>      <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">200</span><span class="p">),</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">content</span>    <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Text</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">created_at</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">updated_at</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">DateTime</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">onupdate</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">tags</span>       <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">relationship</span><span class="p">(</span><span class="s1">&#39;Tag&#39;</span><span class="p">,</span> <span class="n">secondary</span><span class="o">=</span><span class="n">entry_tags</span><span class="p">,</span> <span class="n">backref</span><span class="o">=</span><span class="s1">&#39;entries&#39;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Tag">
+<a class="viewcode-back" href="../modules.html#app.Tag">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Tag</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SQLAlchemy model representing a tag for categorizing entries.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        id (int): Primary key, auto-incremented.</span>
+<span class="sd">        name (str): Unique tag name, max 50 characters.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        tag = Tag(name=&#39;python&#39;)</span>
+<span class="sd">        db.session.add(tag)</span>
+<span class="sd">        db.session.commit()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">id</span>   <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">Integer</span><span class="p">,</span> <span class="n">primary_key</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">db</span><span class="o">.</span><span class="n">Column</span><span class="p">(</span><span class="n">db</span><span class="o">.</span><span class="n">String</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">nullable</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+
+<span class="c1"># ── Helpers ─────────────────────────────────────────────────────────────────</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_parse_entry_form</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse and validate title, content, and tag_ids from a POST form request.</span>
+
+<span class="sd">    Reads ``title``, ``content``, and ``tags`` fields from ``request.form``.</span>
+<span class="sd">    Both ``title`` and ``content`` are stripped of leading/trailing whitespace.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: A 4-tuple ``(title, content, tag_ids, error)`` where:</span>
+
+<span class="sd">            - **title** (*str*): The submitted title.</span>
+<span class="sd">            - **content** (*str*): The submitted content.</span>
+<span class="sd">            - **tag_ids** (*list[int]*): List of selected tag IDs.</span>
+<span class="sd">            - **error** (*str or None*): An error message if validation fails,</span>
+<span class="sd">              or ``None`` if the data is valid.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        title, content, tag_ids, error = _parse_entry_form()</span>
+<span class="sd">        if error:</span>
+<span class="sd">            flash(error, &#39;danger&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">title</span>   <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;title&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;content&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">tag_ids</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s1">&#39;tags&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">content</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">tag_ids</span><span class="p">,</span> <span class="s1">&#39;제목과 내용을 모두 입력해주세요.&#39;</span>
+    <span class="k">return</span> <span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">tag_ids</span><span class="p">,</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_assign_tags</span><span class="p">(</span><span class="n">tag_ids</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Retrieve Tag objects for a list of IDs using a single IN-query.</span>
+
+<span class="sd">    Resolves the N+1 query problem by fetching all matching tags in one</span>
+<span class="sd">    database round-trip instead of one query per ID.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tag_ids (list[int]): List of tag primary-key IDs to look up.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of :class:`Tag` objects matching the given IDs.</span>
+<span class="sd">        Returns an empty list if ``tag_ids`` is falsy.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        tags = _assign_tags([1, 2, 3])</span>
+<span class="sd">        entry.tags = tags</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tag_ids</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="k">return</span> <span class="n">Tag</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">tag_ids</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+<span class="c1"># ── Routes: Dashboard ────────────────────────────────────────────────────────</span>
+
+<div class="viewcode-block" id="index">
+<a class="viewcode-back" href="../modules.html#app.index">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the dashboard with summary statistics and recent entries.</span>
+
+<span class="sd">    Displays the total number of entries, total number of tags, and the</span>
+<span class="sd">    5 most recent journal entries.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Rendered HTML of ``index.html``.</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Dashboard</span>
+<span class="sd">    summary: Dashboard overview</span>
+<span class="sd">    description: Returns the main dashboard with entry/tag counts and recent entries.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      200:</span>
+<span class="sd">        description: Dashboard page rendered successfully.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">total</span>     <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">all_tags</span>  <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+    <span class="n">recent</span>    <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;index.html&#39;</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">total</span><span class="p">,</span> <span class="n">all_tags</span><span class="o">=</span><span class="n">all_tags</span><span class="p">,</span> <span class="n">recent</span><span class="o">=</span><span class="n">recent</span><span class="p">)</span></div>
+
+
+<span class="c1"># ── Routes: Entries ──────────────────────────────────────────────────────────</span>
+
+<div class="viewcode-block" id="entries">
+<a class="viewcode-back" href="../modules.html#app.entries">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/entries&#39;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">entries</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List all journal entries, optionally filtered by a tag.</span>
+
+<span class="sd">    Accepts an optional ``tag`` query parameter (tag ID) to filter entries.</span>
+<span class="sd">    Returns all entries ordered by creation date (newest first).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tag (int, optional): Tag ID as a query-string parameter.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Rendered HTML of ``entries.html``.</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Entries</span>
+<span class="sd">    summary: List journal entries</span>
+<span class="sd">    description: Retrieves all journal entries, optionally filtered by tag ID.</span>
+<span class="sd">    parameters:</span>
+<span class="sd">      - name: tag</span>
+<span class="sd">        in: query</span>
+<span class="sd">        type: integer</span>
+<span class="sd">        required: false</span>
+<span class="sd">        description: Filter entries by this tag ID.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      200:</span>
+<span class="sd">        description: A list of journal entries.</span>
+<span class="sd">      404:</span>
+<span class="sd">        description: Tag not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tag_id</span>  <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;tag&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">query</span>   <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">tag_id</span><span class="p">:</span>
+        <span class="n">tag</span>   <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_or_404</span><span class="p">(</span><span class="n">tag_id</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">tag</span><span class="o">.</span><span class="n">entries</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tag</span>   <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">all_entries</span> <span class="o">=</span> <span class="n">query</span> <span class="k">if</span> <span class="n">tag_id</span> <span class="k">else</span> <span class="n">query</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="n">all_tags</span>    <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;entries.html&#39;</span><span class="p">,</span> <span class="n">entries</span><span class="o">=</span><span class="n">all_entries</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="n">all_tags</span><span class="p">,</span> <span class="n">active_tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="new_entry">
+<a class="viewcode-back" href="../modules.html#app.new_entry">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/entries/new&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">new_entry</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display and handle the new journal entry creation form.</span>
+
+<span class="sd">    **GET**: Renders an empty entry form.</span>
+<span class="sd">    **POST**: Validates and saves a new entry to the database.</span>
+<span class="sd">    Redirects to the entries list on success, or re-renders the form</span>
+<span class="sd">    with an error message on validation failure.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Rendered form HTML (GET/error), or redirect to entries list (success).</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Entries</span>
+<span class="sd">    summary: Create a new journal entry</span>
+<span class="sd">    description: |</span>
+<span class="sd">      GET returns the entry creation form.</span>
+<span class="sd">      POST creates a new journal entry with the provided title, content, and tags.</span>
+<span class="sd">    consumes:</span>
+<span class="sd">      - application/x-www-form-urlencoded</span>
+<span class="sd">    parameters:</span>
+<span class="sd">      - name: title</span>
+<span class="sd">        in: formData</span>
+<span class="sd">        type: string</span>
+<span class="sd">        required: true</span>
+<span class="sd">        description: Title of the new entry.</span>
+<span class="sd">      - name: content</span>
+<span class="sd">        in: formData</span>
+<span class="sd">        type: string</span>
+<span class="sd">        required: true</span>
+<span class="sd">        description: Content body of the new entry.</span>
+<span class="sd">      - name: tags</span>
+<span class="sd">        in: formData</span>
+<span class="sd">        type: array</span>
+<span class="sd">        items:</span>
+<span class="sd">          type: integer</span>
+<span class="sd">        required: false</span>
+<span class="sd">        description: List of tag IDs to associate with the entry.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      200:</span>
+<span class="sd">        description: Entry creation form (GET) or validation failure (POST).</span>
+<span class="sd">      302:</span>
+<span class="sd">        description: Redirect to entries list after successful creation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_tags</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">tag_ids</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">_parse_entry_form</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">flash</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s1">&#39;danger&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;entry_form.html&#39;</span><span class="p">,</span> <span class="n">all_tags</span><span class="o">=</span><span class="n">all_tags</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="n">Entry</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="n">content</span><span class="p">)</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">tags</span> <span class="o">=</span> <span class="n">_assign_tags</span><span class="p">(</span><span class="n">tag_ids</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;일지가 저장되었습니다.&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;entries&#39;</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;entry_form.html&#39;</span><span class="p">,</span> <span class="n">all_tags</span><span class="o">=</span><span class="n">all_tags</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="view_entry">
+<a class="viewcode-back" href="../modules.html#app.view_entry">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/entries/&lt;int:entry_id&gt;&#39;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">view_entry</span><span class="p">(</span><span class="n">entry_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display the detail page for a single journal entry.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        entry_id (int): The primary key of the entry to display.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Rendered HTML of ``entry_detail.html``.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        werkzeug.exceptions.NotFound: If no entry with the given ID exists.</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Entries</span>
+<span class="sd">    summary: View a journal entry</span>
+<span class="sd">    description: Returns the detail page for a specific journal entry.</span>
+<span class="sd">    parameters:</span>
+<span class="sd">      - name: entry_id</span>
+<span class="sd">        in: path</span>
+<span class="sd">        type: integer</span>
+<span class="sd">        required: true</span>
+<span class="sd">        description: The ID of the journal entry.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      200:</span>
+<span class="sd">        description: Entry detail page.</span>
+<span class="sd">      404:</span>
+<span class="sd">        description: Entry not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_or_404</span><span class="p">(</span><span class="n">entry_id</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;entry_detail.html&#39;</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="n">entry</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="edit_entry">
+<a class="viewcode-back" href="../modules.html#app.edit_entry">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/entries/&lt;int:entry_id&gt;/edit&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">edit_entry</span><span class="p">(</span><span class="n">entry_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Display and handle the edit form for an existing journal entry.</span>
+
+<span class="sd">    **GET**: Renders the entry form pre-filled with existing data.</span>
+<span class="sd">    **POST**: Validates and updates the entry in the database.</span>
+<span class="sd">    Redirects to the entry detail page on success.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        entry_id (int): The primary key of the entry to edit.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Rendered form HTML, or redirect to ``view_entry`` on success.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        werkzeug.exceptions.NotFound: If no entry with the given ID exists.</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Entries</span>
+<span class="sd">    summary: Edit a journal entry</span>
+<span class="sd">    description: |</span>
+<span class="sd">      GET returns the pre-filled edit form.</span>
+<span class="sd">      POST updates the entry with the provided data.</span>
+<span class="sd">    consumes:</span>
+<span class="sd">      - application/x-www-form-urlencoded</span>
+<span class="sd">    parameters:</span>
+<span class="sd">      - name: entry_id</span>
+<span class="sd">        in: path</span>
+<span class="sd">        type: integer</span>
+<span class="sd">        required: true</span>
+<span class="sd">        description: The ID of the journal entry to edit.</span>
+<span class="sd">      - name: title</span>
+<span class="sd">        in: formData</span>
+<span class="sd">        type: string</span>
+<span class="sd">        required: true</span>
+<span class="sd">        description: Updated title of the entry.</span>
+<span class="sd">      - name: content</span>
+<span class="sd">        in: formData</span>
+<span class="sd">        type: string</span>
+<span class="sd">        required: true</span>
+<span class="sd">        description: Updated content of the entry.</span>
+<span class="sd">      - name: tags</span>
+<span class="sd">        in: formData</span>
+<span class="sd">        type: array</span>
+<span class="sd">        items:</span>
+<span class="sd">          type: integer</span>
+<span class="sd">        required: false</span>
+<span class="sd">        description: Updated list of tag IDs.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      200:</span>
+<span class="sd">        description: Edit form (GET) or validation failure (POST).</span>
+<span class="sd">      302:</span>
+<span class="sd">        description: Redirect to entry detail page after successful update.</span>
+<span class="sd">      404:</span>
+<span class="sd">        description: Entry not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">entry</span>    <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_or_404</span><span class="p">(</span><span class="n">entry_id</span><span class="p">)</span>
+    <span class="n">all_tags</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">title</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">tag_ids</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">_parse_entry_form</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+            <span class="n">flash</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="s1">&#39;danger&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;entry_form.html&#39;</span><span class="p">,</span> <span class="n">all_tags</span><span class="o">=</span><span class="n">all_tags</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="n">entry</span><span class="p">)</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">title</span>   <span class="o">=</span> <span class="n">title</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">content</span>
+        <span class="n">entry</span><span class="o">.</span><span class="n">tags</span>    <span class="o">=</span> <span class="n">_assign_tags</span><span class="p">(</span><span class="n">tag_ids</span><span class="p">)</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;일지가 수정되었습니다.&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;view_entry&#39;</span><span class="p">,</span> <span class="n">entry_id</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;entry_form.html&#39;</span><span class="p">,</span> <span class="n">all_tags</span><span class="o">=</span><span class="n">all_tags</span><span class="p">,</span> <span class="n">entry</span><span class="o">=</span><span class="n">entry</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="delete_entry">
+<a class="viewcode-back" href="../modules.html#app.delete_entry">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/entries/&lt;int:entry_id&gt;/delete&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_entry</span><span class="p">(</span><span class="n">entry_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete a journal entry and redirect to the entries list.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        entry_id (int): The primary key of the entry to delete.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Response: Redirect to the entries list page.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        werkzeug.exceptions.NotFound: If no entry with the given ID exists.</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Entries</span>
+<span class="sd">    summary: Delete a journal entry</span>
+<span class="sd">    description: Permanently deletes the specified journal entry.</span>
+<span class="sd">    parameters:</span>
+<span class="sd">      - name: entry_id</span>
+<span class="sd">        in: path</span>
+<span class="sd">        type: integer</span>
+<span class="sd">        required: true</span>
+<span class="sd">        description: The ID of the journal entry to delete.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      302:</span>
+<span class="sd">        description: Redirect to entries list after deletion.</span>
+<span class="sd">      404:</span>
+<span class="sd">        description: Entry not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">entry</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_or_404</span><span class="p">(</span><span class="n">entry_id</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;일지가 삭제되었습니다.&#39;</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;entries&#39;</span><span class="p">))</span></div>
+
+
+<span class="c1"># ── Routes: Tags ─────────────────────────────────────────────────────────────</span>
+
+<div class="viewcode-block" id="tags">
+<a class="viewcode-back" href="../modules.html#app.tags">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/tags&#39;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">tags</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;List all available tags sorted alphabetically.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Rendered HTML of ``tags.html``.</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Tags</span>
+<span class="sd">    summary: List all tags</span>
+<span class="sd">    description: Returns a page listing all tags sorted alphabetically.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      200:</span>
+<span class="sd">        description: Tag list page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">all_tags</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Tag</span><span class="o">.</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;tags.html&#39;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="n">all_tags</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="new_tag">
+<a class="viewcode-back" href="../modules.html#app.new_tag">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/tags/new&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">new_tag</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a new tag from a POST form submission.</span>
+
+<span class="sd">    Flashes an error if the name is empty or already exists;</span>
+<span class="sd">    otherwise creates and persists the new tag.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Response: Redirect to the tags page.</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Tags</span>
+<span class="sd">    summary: Create a new tag</span>
+<span class="sd">    description: Creates a new tag. Returns an error if the name is empty or duplicate.</span>
+<span class="sd">    consumes:</span>
+<span class="sd">      - application/x-www-form-urlencoded</span>
+<span class="sd">    parameters:</span>
+<span class="sd">      - name: name</span>
+<span class="sd">        in: formData</span>
+<span class="sd">        type: string</span>
+<span class="sd">        required: true</span>
+<span class="sd">        description: The name of the new tag.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      302:</span>
+<span class="sd">        description: Redirect to the tags page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span><span class="p">:</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;태그 이름을 입력해주세요.&#39;</span><span class="p">,</span> <span class="s1">&#39;danger&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">Tag</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter_by</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">first</span><span class="p">():</span>
+        <span class="n">flash</span><span class="p">(</span><span class="s1">&#39;이미 존재하는 태그입니다.&#39;</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Tag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">))</span>
+        <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">flash</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;태그 &quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;이 추가되었습니다.&#39;</span><span class="p">,</span> <span class="s1">&#39;success&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;tags&#39;</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="delete_tag">
+<a class="viewcode-back" href="../modules.html#app.delete_tag">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/tags/&lt;int:tag_id&gt;/delete&#39;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;POST&#39;</span><span class="p">])</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_tag</span><span class="p">(</span><span class="n">tag_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Delete a tag by its ID.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tag_id (int): The primary key of the tag to delete.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Response: Redirect to the tags page.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        werkzeug.exceptions.NotFound: If no tag with the given ID exists.</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Tags</span>
+<span class="sd">    summary: Delete a tag</span>
+<span class="sd">    description: Permanently deletes the specified tag from the database.</span>
+<span class="sd">    parameters:</span>
+<span class="sd">      - name: tag_id</span>
+<span class="sd">        in: path</span>
+<span class="sd">        type: integer</span>
+<span class="sd">        required: true</span>
+<span class="sd">        description: The ID of the tag to delete.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      302:</span>
+<span class="sd">        description: Redirect to tags page after deletion.</span>
+<span class="sd">      404:</span>
+<span class="sd">        description: Tag not found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">Tag</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">get_or_404</span><span class="p">(</span><span class="n">tag_id</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+    <span class="n">flash</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;태그 &quot;</span><span class="si">{</span><span class="n">tag</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;이 삭제되었습니다.&#39;</span><span class="p">,</span> <span class="s1">&#39;warning&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">url_for</span><span class="p">(</span><span class="s1">&#39;tags&#39;</span><span class="p">))</span></div>
+
+
+<span class="c1"># ── Routes: Search ───────────────────────────────────────────────────────────</span>
+
+<div class="viewcode-block" id="search">
+<a class="viewcode-back" href="../modules.html#app.search">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s1">&#39;/search&#39;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">search</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Search journal entries by title or content keyword.</span>
+
+<span class="sd">    Performs a case-insensitive full-text search across both ``title``</span>
+<span class="sd">    and ``content`` fields when a query is provided.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        q (str): Search keyword passed as a query-string parameter.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Rendered HTML of ``search.html`` with matching results.</span>
+<span class="sd">    ---</span>
+<span class="sd">    tags:</span>
+<span class="sd">      - Search</span>
+<span class="sd">    summary: Search journal entries</span>
+<span class="sd">    description: |</span>
+<span class="sd">      Case-insensitive full-text search over entry titles and content.</span>
+<span class="sd">      Returns matching entries ordered by creation date (newest first).</span>
+<span class="sd">    parameters:</span>
+<span class="sd">      - name: q</span>
+<span class="sd">        in: query</span>
+<span class="sd">        type: string</span>
+<span class="sd">        required: false</span>
+<span class="sd">        description: Search keyword.</span>
+<span class="sd">    responses:</span>
+<span class="sd">      200:</span>
+<span class="sd">        description: Search results page.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">q</span>       <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;q&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">q</span><span class="p">:</span>
+        <span class="n">like</span>    <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;%</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s1">%&#39;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">ilike</span><span class="p">(</span><span class="n">like</span><span class="p">))</span> <span class="o">|</span> <span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">ilike</span><span class="p">(</span><span class="n">like</span><span class="p">))</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">Entry</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">desc</span><span class="p">())</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s1">&#39;search.html&#39;</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">q</span><span class="p">,</span> <span class="n">results</span><span class="o">=</span><span class="n">results</span><span class="p">)</span></div>
+
+
+<span class="c1"># ── Init ─────────────────────────────────────────────────────────────────────</span>
+
+<span class="k">with</span> <span class="n">app</span><span class="o">.</span><span class="n">app_context</span><span class="p">():</span>
+    <span class="n">db</span><span class="o">.</span><span class="n">create_all</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="s1">&#39;0.0.0.0&#39;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">5001</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Dev Journal Contributors.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
