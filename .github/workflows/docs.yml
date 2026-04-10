@@ -1,0 +1,46 @@
+name: Deploy Sphinx Docs to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - docs/sphinx-flasgger-readme
+  workflow_dispatch:  # Allow manual trigger from Actions tab
+
+permissions:
+  contents: write  # Required to push to gh-pages branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build Sphinx HTML documentation
+        run: |
+          cd docs
+          python -m sphinx -b html . _build/html
+        env:
+          SECRET_KEY: sphinx-build-key
+          DATABASE_URL: sqlite:///:memory:
+
+      - name: Add .nojekyll to prevent Jekyll processing
+        run: touch docs/_build/html/.nojekyll
+
+      - name: Deploy to GitHub Pages (gh-pages branch)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
+          publish_branch: gh-pages
+          commit_message: 'docs: auto-deploy Sphinx documentation [skip ci]'
